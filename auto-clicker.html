@@ -88,7 +88,7 @@
   </div>
 
   <div class="buttons">
-    <button onclick="start()">Start (F6)</button>
+    <button onclick="start()">Start (Ctrl + .)</button>
     <button onclick="stop()">Stop</button>
   </div>
 
@@ -157,8 +157,9 @@ function stop() {
   document.getElementById("status").textContent = "Status: OFF";
 }
 
+// Hotkey updated to Ctrl + .
 document.addEventListener("keydown", e => {
-  if (e.key === "F6") {
+  if (e.ctrlKey && e.key === ".") {
     clicking ? stop() : start();
   }
 });
