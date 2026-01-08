@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OP Auto Clicker (Web)</title>
+<style>
+  body {
+    background: #e6e6e6;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding-top: 30px;
+  }
+
+  .window {
+    background: #f2f2f2;
+    border: 1px solid #999;
+    width: 320px;
+    padding: 10px;
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  label {
+    font-size: 13px;
+  }
+
+  input, select, button {
+    margin-top: 5px;
+    width: 100%;
+  }
+
+  .row {
+    margin-bottom: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 5px;
+  }
+
+  button {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .status {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <h2>OP Auto Clicker</h2>
+
+  <div class="row">
+    <label>Click interval (ms)</label>
+    <input type="number" id="interval" value="100">
+  </div>
+
+  <div class="row">
+    <label>Mouse button</label>
+    <select id="button">
+      <option value="left">Left</option>
+      <option value="right">Right</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label>Click type</label>
+    <select id="mode">
+      <option value="cursor">Follow Cursor</option>
+      <option value="fixed">Fixed Location</option>
+    </select>
+    <button onclick="setFixed()">Set Location</button>
+  </div>
+
+  <div class="row">
+    <label>Click count (0 = infinite)</label>
+    <input type="number" id="count" value="0">
+  </div>
+
+  <div class="buttons">
+    <button onclick="start()">Start (F6)</button>
+    <button onclick="stop()">Stop</button>
+  </div>
+
+  <div class="status" id="status">Status: OFF</div>
+</div>
+
+<script>
+let clicking = false;
+let timer;
+let clicksDone = 0;
+let fixedX = 0;
+let fixedY = 0;
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener("mousemove", e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function setFixed() {
+  fixedX = mouseX;
+  fixedY = mouseY;
+  alert(`Fixed location set at X:${fixedX}, Y:${fixedY}`);
+}
+
+function clickAt(x, y, button) {
+  const evt = new MouseEvent("mousedown", { bubbles: true, button: button === "left" ? 0 : 2 });
+  const evt2 = new MouseEvent("mouseup", { bubbles: true, button: button === "left" ? 0 : 2 });
+  document.elementFromPoint(x, y)?.dispatchEvent(evt);
+  document.elementFromPoint(x, y)?.dispatchEvent(evt2);
+}
+
+function start() {
+  if (clicking) return;
+  clicking = true;
+  clicksDone = 0;
+  document.getElementById("status").textContent = "Status: ON";
+
+  const interval = parseInt(document.getElementById("interval").value);
+  const mode = document.getElementById("mode").value;
+  const button = document.getElementById("button").value;
+  const maxClicks = parseInt(document.getElementById("count").value);
+
+  timer = setInterval(() => {
+    if (!clicking) return;
+
+    if (maxClicks !== 0 && clicksDone >= maxClicks) {
+      stop();
+      return;
+    }
+
+    if (mode === "cursor") {
+      clickAt(mouseX, mouseY, button);
+    } else {
+      clickAt(fixedX, fixedY, button);
+    }
+
+    clicksDone++;
+  }, interval);
+}
+
+function stop() {
+  clicking = false;
+  clearInterval(timer);
+  document.getElementById("status").textContent = "Status: OFF";
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "F6") {
+    clicking ? stop() : start();
+  }
+});
+</script>
+
+</body>
+</html>
