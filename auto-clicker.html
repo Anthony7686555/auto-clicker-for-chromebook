@@ -89,7 +89,7 @@
 
   <div class="buttons">
     <button onclick="start()">Start (Ctrl + .)</button>
-    <button onclick="stop()">Stop</button>
+    <button onclick="stop()">Stop (Ctrl + ,)</button>
   </div>
 
   <div class="status" id="status">Status: OFF</div>
@@ -116,10 +116,11 @@ function setFixed() {
 }
 
 function clickAt(x, y, button) {
-  const evt = new MouseEvent("mousedown", { bubbles: true, button: button === "left" ? 0 : 2 });
-  const evt2 = new MouseEvent("mouseup", { bubbles: true, button: button === "left" ? 0 : 2 });
-  document.elementFromPoint(x, y)?.dispatchEvent(evt);
-  document.elementFromPoint(x, y)?.dispatchEvent(evt2);
+  const btn = button === "left" ? 0 : 2;
+  const down = new MouseEvent("mousedown", { bubbles: true, button: btn });
+  const up = new MouseEvent("mouseup", { bubbles: true, button: btn });
+  document.elementFromPoint(x, y)?.dispatchEvent(down);
+  document.elementFromPoint(x, y)?.dispatchEvent(up);
 }
 
 function start() {
@@ -128,10 +129,10 @@ function start() {
   clicksDone = 0;
   document.getElementById("status").textContent = "Status: ON";
 
-  const interval = parseInt(document.getElementById("interval").value);
-  const mode = document.getElementById("mode").value;
-  const button = document.getElementById("button").value;
-  const maxClicks = parseInt(document.getElementById("count").value);
+  const interval = parseInt(intervalInput.value);
+  const mode = modeSelect.value;
+  const button = buttonSelect.value;
+  const maxClicks = parseInt(countInput.value);
 
   timer = setInterval(() => {
     if (!clicking) return;
@@ -157,12 +158,17 @@ function stop() {
   document.getElementById("status").textContent = "Status: OFF";
 }
 
-// Hotkey updated to Ctrl + .
+// Hotkeys
 document.addEventListener("keydown", e => {
-  if (e.ctrlKey && e.key === ".") {
-    clicking ? stop() : start();
-  }
+  if (e.ctrlKey && e.key === "." && !clicking) start();
+  if (e.ctrlKey && e.key === "," && clicking) stop();
 });
+
+// Cache inputs
+const intervalInput = document.getElementById("interval");
+const modeSelect = document.getElementById("mode");
+const buttonSelect = document.getElementById("button");
+const countInput = document.getElementById("count");
 </script>
 
 </body>
