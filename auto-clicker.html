@@ -104,6 +104,11 @@ let fixedY = 0;
 let mouseX = 0;
 let mouseY = 0;
 
+const intervalInput = document.getElementById("interval");
+const modeSelect = document.getElementById("mode");
+const buttonSelect = document.getElementById("button");
+const countInput = document.getElementById("count");
+
 document.addEventListener("mousemove", e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
@@ -158,17 +163,13 @@ function stop() {
   document.getElementById("status").textContent = "Status: OFF";
 }
 
-// Hotkeys
+// ✅ FIXED HOTKEYS (NO DOUBLE FIRE)
 document.addEventListener("keydown", e => {
+  if (e.repeat) return;
+
   if (e.ctrlKey && e.key === "." && !clicking) start();
   if (e.ctrlKey && e.key === "," && clicking) stop();
 });
-
-// Cache inputs
-const intervalInput = document.getElementById("interval");
-const modeSelect = document.getElementById("mode");
-const buttonSelect = document.getElementById("button");
-const countInput = document.getElementById("count");
 </script>
 
 </body>
